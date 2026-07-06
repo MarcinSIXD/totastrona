@@ -2,14 +2,57 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Moja Strona</title>
+  <title>Clicker</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+    }
+
+    #counter {
+      font-size: 40px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      font-size: 28px;
+      padding: 15px 40px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h1>Siema 👋</h1>
-  <p>Moja pierwsza strona działa!</p>
 
-  <button onclick="alert('Klik działa!')">
-    Kliknij mnie
-  </button>
+  <div id="counter">0</div>
+
+  <button id="btn">przycisk</button>
+
+  <script>
+    let clicks = 0;
+    let canClick = true;
+
+    const counter = document.getElementById("counter");
+    const btn = document.getElementById("btn");
+
+    btn.addEventListener("click", () => {
+      if (!canClick) return;
+
+      canClick = false;
+
+      clicks++;
+      counter.textContent = clicks;
+
+      setTimeout(() => {
+        canClick = true;
+      }, 200); // 0.2 sekundy cooldown
+    });
+  </script>
+
 </body>
 </html>
