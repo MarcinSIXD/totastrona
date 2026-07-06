@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Clicker</title>
+  <title>Global Clicker</title>
   <style>
     body {
       margin: 0;
@@ -11,17 +11,16 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      font-family: Arial;
     }
 
     #counter {
-      font-size: 40px;
+      font-size: 60px;
       margin-bottom: 20px;
     }
 
     button {
-      font-size: 28px;
+      font-size: 30px;
       padding: 15px 40px;
       cursor: pointer;
     }
@@ -29,30 +28,58 @@
 </head>
 <body>
 
-  <div id="counter">0</div>
+<div id="counter">0</div>
+<button id="btn">przycisk</button>
 
-  <button id="btn">przycisk</button>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } 
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <script>
-    let clicks = 0;
-    let canClick = true;
+  // 🔥 TWÓJ CONFIG (już wstawiony)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCrciullML6Ewrr-dmz5Vj7WCgNVXeq92A",
+    authDomain: "totastrona.firebaseapp.com",
+    projectId: "totastrona",
+    storageBucket: "totastrona.firebasestorage.app",
+    messagingSenderId: "68166376642",
+    appId: "1:68166376642:web:1e59a8ebd94a1bc2bfaf5b",
+    measurementId: "G-RC5MQY0HJ0"
+  };
 
-    const counter = document.getElementById("counter");
-    const btn = document.getElementById("btn");
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    btn.addEventListener("click", () => {
-      if (!canClick) return;
+  const counter = document.getElementById("counter");
+  const btn = document.getElementById("btn");
 
-      canClick = false;
+  const ref = doc(db, "clicker", "global");
 
-      clicks++;
-      counter.textContent = clicks;
+  // tworzy licznik jeśli nie istnieje
+  setDoc(ref, { count: 0 }, { merge: true });
 
-      setTimeout(() => {
-        canClick = true;
-      }, 200); // 0.2 sekundy cooldown
+  // LIVE licznik (wszyscy widzą to samo)
+  onSnapshot(ref, (snap) => {
+    counter.textContent = snap.data().count;
+  });
+
+  let canClick = true;
+
+  btn.addEventListener("click", async () => {
+    if (!canClick) return;
+    canClick = false;
+
+    const data = await getDoc(ref);
+    const current = data.exists() ? data.data().count : 0;
+
+    await updateDoc(ref, {
+      count: current + 1
     });
-  </script>
+
+    setTimeout(() => canClick = true, 200); // cooldown 0.2s
+  });
+
+</script>
 
 </body>
 </html>
